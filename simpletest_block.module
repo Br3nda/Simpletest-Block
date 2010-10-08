@@ -43,7 +43,7 @@ function simpletest_block_form_alter($form, $form_state, $form_id) {
   if($form_id == 'simpletest_result_form') {
 
     foreach($form['result']['results'] as $name => $result) {
-      db_query("DELETE FROM {simplest_results} WHERE test_name='%s'", $name);
+      db_query("DELETE FROM {simpletest_results} WHERE test_name='%s'", $name);
     //    drupal_set_message("$name = " . print_r($result, 1));
       $r->pass = $result['summary']['#pass'];
       $r->fail = $result['summary']['#fail'];
