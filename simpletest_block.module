@@ -28,7 +28,7 @@ function simpletest_block_view() {
     $output .= '<h3>'. $r->test_name .'</h3>';
     $total = $r->pass + $r->fail + $r->exception;
     if($r->pass)
-    $output .= '<div style="background-color: green; width: '. floor(($r->pass / $total)*100) .'px">'. floor($r->pass / $total) . '% '. $r->pass .'</div>';
+    $output .= '<div style="background-color: green; width: '. floor(($r->pass / $total)*100) .'px">'. $r->pass .'</div>';
     if($r->exception)
     $output .= '<div style="background-color: orange; width: '. floor(($r->exception / $total)*100) .'px">'. $r->exception .'</div>';
     if($r->fail)
@@ -42,16 +42,17 @@ function simpletest_block_view() {
 function simpletest_block_form_alter($form, $form_state, $form_id) {
   if($form_id == 'simpletest_result_form') {
 
-   foreach($form['result']['results'] as $name => $result) {
-//    drupal_set_message("$name = " . print_r($result, 1));
-    $r->pass = $result['summary']['#pass'];
-    $r->fail = $result['summary']['#fail'];
-    $r->exception = $result['summary']['#exception'];
-    $r->test_name = $name; 
-//    $total = $r->pass + $r->fail + $r->exception;
+    foreach($form['result']['results'] as $name => $result) {
+      db_query("DELETE FROM {simplest_results} WHERE test_name='%s'", $name);
+    //    drupal_set_message("$name = " . print_r($result, 1));
+      $r->pass = $result['summary']['#pass'];
+      $r->fail = $result['summary']['#fail'];
+      $r->exception = $result['summary']['#exception'];
+      $r->test_name = $name; 
+    //    $total = $r->pass + $r->fail + $r->exception;
 
-    drupal_write_record('simpletest_results', $r);
-      
-   }
+      drupal_write_record('simpletest_results', $r);
+        
+    }
   }
 }
