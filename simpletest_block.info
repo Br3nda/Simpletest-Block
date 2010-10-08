@@ -1,0 +1,4 @@
+core = 6.x
+name = Simple Test Block
+dependencies[] = simpletest
+

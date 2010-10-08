@@ -1,0 +1,57 @@
+<?php
+
+function simpletest_block_block($op = 'list', $delta = '', $edit = array()) {
+ //simpletest_result_get($test_id)
+  switch ($op) {
+    case 'list':
+      drupal_set_message(__FUNCTION__);
+      // If $op is "list", we just need to return a list of block descriptions.
+      // This is used to provide a list of possible blocks to the administrator;
+      // end users will not see these descriptions.
+      $blocks['simpletest'] = array(
+        'info'       => t('Simple Test Status'),
+      );
+
+      return $blocks;
+    break;
+   case 'view':
+    $block = array(
+      'subject' => t('Simple Test Status'),
+      'content' => simpletest_block_view(),
+    );
+    return $block;
+   break;
+  }
+}
+
+function simpletest_block_view() {
+  drupal_add_css(drupal_get_path('module', 'simpletest') . '/simpletest.css', 'module');
+  $result = db_query("SELECT * FROM {simpletest_results}");
+  $rows = array();
+  while ($record = db_fetch_array($result)) {
+    $rows[] = $record;
+  }
+  return theme('table', array(), $rows);
+//  module_load_include('inc', 'simpletest', 'simpletest.pages');
+  //$classes = simpletest_test_get_all_classes(); // Drupal 6.
+//  $results = simpletest_result_get($test_id);
+  //foreach ($results as $group => $assertions) {
+
+  return __FUNCTION__;
+}
+function simpletest_block_form_alter($form, $form_state, $form_id) {
+  if($form_id == 'simpletest_result_form') {
+
+   foreach($form['result']['results'] as $name => $result) {
+//    drupal_set_message("$name = " . print_r($result, 1));
+    $r->pass = $result['summary']['#pass'];
+    $r->fail = $result['summary']['#fail'];
+    $r->exception = $result['summary']['#exception'];
+    $r->test_name = $name; 
+//    $total = $r->pass + $r->fail + $r->exception;
+
+    drupal_write_record('simpletest_results', $r);
+      
+   }
+  }
+}

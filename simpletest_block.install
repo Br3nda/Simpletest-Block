@@ -1,0 +1,22 @@
+<?php
+function simpletest_block_install() {
+  drupal_install_schema('simpletest_block');
+}
+function simpletest_block_uninstall() {
+  drupal_uninstall_schema('simpletest_block');
+}
+
+function simpletest_block_schema() {
+  $schema['simpletest_results'] = array(
+    'fields' => array(
+      'test_name' => array('type' => 'text'),
+      'pass' => array('type' => 'int'),
+      'fail' => array('type' => 'int'),
+      'exception' => array('type' => 'int'),
+    ),
+    'primary key' => array('test_name'),
+  );
+  return $schema;
+}
+
+
