@@ -4,10 +4,6 @@ function simpletest_block_block($op = 'list', $delta = '', $edit = array()) {
  //simpletest_result_get($test_id)
   switch ($op) {
     case 'list':
-      drupal_set_message(__FUNCTION__);
-      // If $op is "list", we just need to return a list of block descriptions.
-      // This is used to provide a list of possible blocks to the administrator;
-      // end users will not see these descriptions.
       $blocks['simpletest'] = array(
         'info'       => t('Simple Test Status'),
       );
@@ -27,17 +23,21 @@ function simpletest_block_block($op = 'list', $delta = '', $edit = array()) {
 function simpletest_block_view() {
   drupal_add_css(drupal_get_path('module', 'simpletest') . '/simpletest.css', 'module');
   $result = db_query("SELECT * FROM {simpletest_results}");
-  $rows = array();
-  while ($record = db_fetch_array($result)) {
-    $rows[] = $record;
+  $output = '';
+  while ($r = db_fetch_object($result)) {
+    $output .= '<h3>'. $r->test_name .'</h3>';
+    $total = $r->pass + $r->fail + $r->exception;
+    if($r->pass)
+    $output .= '<div style="background-color: green; width: '. floor(($r->pass / $total)*100) .'px">'. floor($r->pass / $total) . '% '. $r->pass .'</div>';
+    if($r->exception)
+    $output .= '<div style="background-color: orange; width: '. floor(($r->exception / $total)*100) .'px">'. $r->exception .'</div>';
+    if($r->fail)
+    $output .= '<div style="background-color: red; width: '. floor(($r->fail / $total)*100) .'px">'. $r->fail .'</div>';
+    $output .= '<hr/>';
+//     $output .= print_r($r, 1);
+    
   }
-  return theme('table', array(), $rows);
-//  module_load_include('inc', 'simpletest', 'simpletest.pages');
-  //$classes = simpletest_test_get_all_classes(); // Drupal 6.
-//  $results = simpletest_result_get($test_id);
-  //foreach ($results as $group => $assertions) {
-
-  return __FUNCTION__;
+  return $output;
 }
 function simpletest_block_form_alter($form, $form_state, $form_id) {
   if($form_id == 'simpletest_result_form') {
