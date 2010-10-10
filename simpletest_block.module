@@ -10,13 +10,15 @@ function simpletest_block_block($op = 'list', $delta = '', $edit = array()) {
 
       return $blocks;
     break;
-   case 'view':
-    $block = array(
-      'subject' => t('Simple Test Status'),
-      'content' => simpletest_block_view(),
-    );
-    return $block;
-   break;
+    case 'view':
+      $block = array(
+        'subject' => t('Regression Test Status'),
+        'content' => simpletest_block_view(),
+      );
+      return $block;
+    break;
+    case 'configure':
+    break;
   }
 }
 
@@ -24,20 +26,35 @@ function simpletest_block_view() {
   drupal_add_css(drupal_get_path('module', 'simpletest') . '/simpletest.css', 'module');
   $result = db_query("SELECT * FROM {simpletest_results}");
   $output = '';
+  $rows = array();
   while ($r = db_fetch_object($result)) {
     $output .= '<h3>'. $r->test_name .'</h3>';
     $total = $r->pass + $r->fail + $r->exception;
-    if($r->pass)
-    $output .= '<div style="background-color: green; width: '. floor(($r->pass / $total)*100) .'px">'. $r->pass .'</div>';
-    if($r->exception)
-    $output .= '<div style="background-color: orange; width: '. floor(($r->exception / $total)*100) .'px">'. $r->exception .'</div>';
-    if($r->fail)
-    $output .= '<div style="background-color: red; width: '. floor(($r->fail / $total)*100) .'px">'. $r->fail .'</div>';
-    $output .= '<hr/>';
-//     $output .= print_r($r, 1);
-    
+
+//    if($r->pass) {
+      $rows[] = array(
+        '<div style="background-color: green; width: '. floor(($r->pass / $total)*100) .'px">'. '&nbsp;</div>',
+        t('!count passes', array('!count' => $r->pass))
+      );
+//    }
+
+//    if($r->exception) {
+      $rows[] = array(
+        '<div style="background-color: orange; width: '. floor(($r->exception / $total)*100) .'px">&nbsp;</div>',
+        t('!count exceptions', array('!count' => $r->exception))
+      );
+//    }
+
+//    if($r->fail) {
+      $rows[] = array(
+        '<div style="background-color: red; width: '. floor(($r->fail / $total)*100) .'px">&nbsp;</div>',
+        t('!count failures', array('!count' => $r->fail))
+      );
+//    }
+    $output .= theme('table', array(), $rows);;
+    $rows = array();
   }
-  return $output;
+  return $output; 
 }
 function simpletest_block_form_alter($form, $form_state, $form_id) {
   if($form_id == 'simpletest_result_form') {
