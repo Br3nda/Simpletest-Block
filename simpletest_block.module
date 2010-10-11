@@ -24,7 +24,7 @@ function simpletest_block_block($op = 'list', $delta = '', $edit = array()) {
 
 function simpletest_block_view() {
   drupal_add_css(drupal_get_path('module', 'simpletest') . '/simpletest.css', 'module');
-  $result = db_query("SELECT * FROM {simpletest_results}");
+  $result = db_query("SELECT * FROM {simpletest_results} ORDER BY test_name");
   $output = '';
   $rows = array();
   while ($r = db_fetch_object($result)) {
